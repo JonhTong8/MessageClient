@@ -108,7 +108,7 @@ public class QqFriendList extends JFrame implements ActionListener,MouseListener
 		jpmsr3.add(jpmsr2,"Center");
 		jpmsr3.add(jpmsr_jb3,"South");
 		
-		//处理第三章卡片
+		//处理第三张卡片
 		jphmd_jb1 = new JButton("我的好友");
 		jphmd_jb1.addActionListener(this);
 		jphmd_jb2 = new JButton("陌生人");

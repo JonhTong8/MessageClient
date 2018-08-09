@@ -20,39 +20,59 @@ import java.io.*;
 public class QqChat extends JFrame implements ActionListener,KeyListener{
 
 	JTextArea jta = null;
+	JEditorPane jep = null;//内容显示
 	JTextField jtf = null;
 	JButton jb = null;
 	JPanel jp = null;
+	JPanel jp2 = null;
+	JButton jb2 = null; //图片选择按钮
+	JFileChooser jfc = null;//文件选择器
 	//发送者
 	private String myName;
 	private String friendName;
 	public static void main(String[] args) {
-		//QqChat qqchat = new QqChat("张希如");
+		QqChat qqchat = new QqChat("张希如","曹泽通");
 	}
 	
 	public QqChat(String myName,String friendName) {
 		this.myName=myName;
 		this.friendName=friendName;
 		
-		jta = new JTextArea();
+		int panelWidth = 700;
+		int panelHeight = 400;
+//		jta = new JTextArea();
+//		jta.setBounds(0, panelHeight*2/3+30, panelWidth, panelHeight*2/3);
+		jep = new JEditorPane();
+		jep.setBounds(0, panelHeight*2/3+30, panelWidth, panelHeight*2/3);
 		jtf = new JTextField(15);
 		jtf.addKeyListener(this);
 		jb = new JButton("发送");
+		jb.setBounds(0, panelHeight*2/3+30, 30, 30);
 		jb.addActionListener(this);
 		jp = new JPanel();
 		jp.add(jtf);
 		jp.add(jb);
+		jp.setBounds(0, panelHeight*2/3+30, panelWidth, panelHeight/3-30);
+		jp2 = new JPanel(); //功能区 预留8个格子
+		jp2.setBounds(0,panelHeight*2/3 , panelWidth, 30);
+		jb2 = new JButton(new ImageIcon("image/picture.gif"));
+		jb2.addActionListener(this);
+		jb2.setBounds(0, 0, 30, 30);
+		jp2.add(jb2);
+
 		
-		this.add(jta,"Center");
-		this.add(jp, "South");
+	//	this.add(jta,"Center");
+		this.add(jep, "Center");
+		this.add(jp2,"North");
+		this.add(jp,"South");
 		this.setTitle("你正在和"+friendName+"聊天");
 		this.setIconImage((new ImageIcon("image/").getImage()));
-		int panelWidth = 300;
-		int panelHeight = 200;
+		
 		this.setSize(panelWidth, panelHeight);
 		Settings settings = new Settings();
 		this.setLocation( (settings.getScreenWidth()-panelWidth)/2, (settings.getScreenHeight()-panelHeight)/2);
 		this.setVisible(true);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 	}
 
 	public void sendMessage() {
@@ -69,7 +89,7 @@ public class QqChat extends JFrame implements ActionListener,KeyListener{
 			ObjectOutputStream  oos = new ObjectOutputStream(ManageClientConServerThread.getClientConServerThread(myName).getSocket().getOutputStream());
 			oos.writeObject(ms);
 			String info = ms.getSender()+" 给 "+ms.getGetter()+" 说 "+ms.getCon()+"\r\n";
-			this.jta.append(info);
+			this.jep.add(new JTextArea(),"info");// append(info);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -78,7 +98,8 @@ public class QqChat extends JFrame implements ActionListener,KeyListener{
 	
 	public void showMessage(Message ms) {
 		String info = ms.getSender()+" 给 "+ms.getGetter()+" 说 "+ms.getCon()+"\r\n";
-		this.jta.append(info);
+		//this.jta.append(info);
+		this.jep.add(new JTextArea(),"info");
 	}
 	
 	@Override
@@ -87,6 +108,20 @@ public class QqChat extends JFrame implements ActionListener,KeyListener{
 		if (e.getSource() == jb) {
 			//用户点击发送
 			this.sendMessage();	
+		}else if (e.getSource() == jb2) {
+				jfc=new JFileChooser();  //图片选择按钮
+		        jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES );  
+		        jfc.showDialog(new JLabel(), "选择图片");  
+		        File file=jfc.getSelectedFile();  
+		        if(file.isDirectory()){
+		        	JOptionPane jop = new JOptionPane();
+		        	JOptionPane.showMessageDialog(new JTextArea(), "这是文件夹，请选择图片文件", "警告！", JOptionPane.WARNING_MESSAGE );
+
+		           // System.out.println("文件夹:"+file.getAbsolutePath());  
+		        }else if(file.isFile()){  
+		            System.out.println("文件:"+file.getAbsolutePath());  
+		        }  
+		        //System.out.println(jfc.getSelectedFile().getName()); 
 		}
 	}
 
