@@ -19,19 +19,20 @@ import java.io.*;
 
 public class QqChat extends JFrame implements ActionListener,KeyListener{
 
-	JTextArea jta = null;
-	JEditorPane jep = null;//内容显示
+	//JTextArea jta = null;
+	JTextPane jta = null;
 	JTextField jtf = null;
 	JButton jb = null;
 	JPanel jp = null;
 	JPanel jp2 = null;
 	JButton jb2 = null; //图片选择按钮
 	JFileChooser jfc = null;//文件选择器
-	//发送者
+	//发送者 接收者
 	private String myName;
 	private String friendName;
+	
 	public static void main(String[] args) {
-		QqChat qqchat = new QqChat("张希如","曹泽通");
+	//	QqChat qqchat = new QqChat("张希如","曹泽通");
 	}
 	
 	public QqChat(String myName,String friendName) {
@@ -40,10 +41,8 @@ public class QqChat extends JFrame implements ActionListener,KeyListener{
 		
 		int panelWidth = 700;
 		int panelHeight = 400;
-//		jta = new JTextArea();
-//		jta.setBounds(0, panelHeight*2/3+30, panelWidth, panelHeight*2/3);
-		jep = new JEditorPane();
-		jep.setBounds(0, panelHeight*2/3+30, panelWidth, panelHeight*2/3);
+		jta = new JTextPane();
+		jta.setBounds(0, panelHeight*2/3+30, panelWidth, panelHeight*2/3);
 		jtf = new JTextField(15);
 		jtf.addKeyListener(this);
 		jb = new JButton("发送");
@@ -61,8 +60,8 @@ public class QqChat extends JFrame implements ActionListener,KeyListener{
 		jp2.add(jb2);
 
 		
-	//	this.add(jta,"Center");
-		this.add(jep, "Center");
+		this.add(jta,"Center");
+		
 		this.add(jp2,"North");
 		this.add(jp,"South");
 		this.setTitle("你正在和"+friendName+"聊天");
@@ -89,17 +88,75 @@ public class QqChat extends JFrame implements ActionListener,KeyListener{
 			ObjectOutputStream  oos = new ObjectOutputStream(ManageClientConServerThread.getClientConServerThread(myName).getSocket().getOutputStream());
 			oos.writeObject(ms);
 			String info = ms.getSender()+" 给 "+ms.getGetter()+" 说 "+ms.getCon()+"\r\n";
-			this.jep.add(new JTextArea(),"info");// append(info);
+			this.jta.add(new JTextArea(),"info");// append(info);
+			oos.close();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		}finally{
+			
 		}
 	}
 	
 	public void showMessage(Message ms) {
 		String info = ms.getSender()+" 给 "+ms.getGetter()+" 说 "+ms.getCon()+"\r\n";
-		//this.jta.append(info);
-		this.jep.add(new JTextArea(),"info");
+	//	this.jta.append(info);
+		
+	}
+	
+	public void showImage(String image) {
+		Icon icon = new ImageIcon(image);
+		this.jta.insertIcon(icon);
+	}
+	
+	public void sendImage(String image) {
+		//用户发送图片
+		Message ms = new Message();
+		ms.setGetter(this.friendName);
+		ms.setSender(this.myName);
+		ms.setMesType(MessageType.message_image);
+		ms.setTime(new java.util.Date().toString());
+		
+		File file = new File(image);
+		//发送给服务器
+		try {
+			//先发送message 再发送图片
+			ObjectOutputStream oos = new ObjectOutputStream(ManageClientConServerThread.getClientConServerThread(myName).getSocket().getOutputStream());
+			oos.writeObject(ms);
+			//发送图片
+			FileInputStream fis = new FileInputStream(file);
+			DataOutputStream dos = new DataOutputStream(ManageClientConServerThread.getClientConServerThread(myName).getSocket().getOutputStream());
+			//发送文件名和长度
+			dos.writeUTF(file.getName());
+			dos.flush();
+			dos.writeLong(file.length());
+			dos.flush();
+			//发送图片
+			byte[] bytes = new byte[1024];
+			int length = 0;
+			long progress = 0;
+			while ((length = fis.read(bytes,0,bytes.length)) != -1) {
+				dos.write(bytes,0,length);
+				dos.flush();
+			}
+			
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void sendFile(String filedir) {
+		
+	}
+	
+	public void getFile(String filedir) {
+		
 	}
 	
 	@Override
@@ -119,7 +176,10 @@ public class QqChat extends JFrame implements ActionListener,KeyListener{
 
 		           // System.out.println("文件夹:"+file.getAbsolutePath());  
 		        }else if(file.isFile()){  
-		            System.out.println("文件:"+file.getAbsolutePath());  
+		        	//如果是文件 就显示（暂时不考虑该文件不是图片）
+		        	this.showImage(file.getAbsolutePath().toString());
+		        	this.sendImage(file.getAbsolutePath().toString());
+		           // System.out.println("文件:"+file.getAbsolutePath());  
 		        }  
 		        //System.out.println(jfc.getSelectedFile().getName()); 
 		}

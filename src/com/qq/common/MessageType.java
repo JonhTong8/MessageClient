@@ -11,4 +11,7 @@ public interface MessageType {
 	String message_get_onLineFriend="4";//请求获得在线好友信息包
 	String message_ret_onLineFriend="5";//返回在线好友信息包
 	String message_logout="6";//退出登录信息包
+	String message_send_file="7";//发送文件
+	String message_get_file="8";//同意获取文件
+	String message_image="9";//发送图片
 }
