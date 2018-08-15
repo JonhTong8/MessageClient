@@ -100,7 +100,7 @@ public class QqChat extends JFrame implements ActionListener,KeyListener{
 	
 	public void showMessage(Message ms) {
 		String info = ms.getSender()+" 给 "+ms.getGetter()+" 说 "+ms.getCon()+"\r\n";
-	//	this.jta.append(info);
+		this.jta.add(new JTextArea(),"info");
 		
 	}
 	

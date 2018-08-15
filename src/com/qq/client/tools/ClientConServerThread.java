@@ -10,6 +10,7 @@ import com.qq.client.view.QqChat;
 import com.qq.client.view.QqFriendList;
 import com.qq.common.Message;
 import com.qq.common.MessageType;
+import com.qq.common.Random;
 
 public class ClientConServerThread extends Thread{
 
@@ -50,6 +51,28 @@ public class ClientConServerThread extends Thread{
 					if(qqFriendList != null) {
 						qqFriendList.updateFriendList(m);
 					}
+				}else if (m.getMesType().equals(MessageType.message_send_file)) {
+					QqChat qqChat = ManageQqChat.getQqChat(m.getGetter()+" "+m.getSender());
+					
+					String filename = new Random().getRandom(8);
+					File directory = new File("f:\\Message_tmp");
+					if (!directory.exists()) {
+						directory.mkdir();
+					}
+					File file = new File(directory.getAbsolutePath()+File.separatorChar+filename);
+					FileOutputStream fos = new FileOutputStream(file);
+					DataInputStream dis =  new DataInputStream(s.getInputStream());
+					
+					String realFilename = dis.readUTF();
+					long fileLength = dis.readLong();
+					
+					byte[] bytes = new byte[1024];
+					int length = 0;
+					while ((length = dis.read(bytes,0,bytes.length)) != -1) {
+						fos.write(bytes, 0, length);
+						fos.flush();
+					}
+					qqChat.showImage(file.getAbsolutePath().toString());
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
