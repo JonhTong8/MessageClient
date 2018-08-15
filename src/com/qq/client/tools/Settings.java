@@ -5,7 +5,27 @@ import java.awt.Toolkit;
 
 public class Settings {
 
+	private String serverIp = "192.168.3.9";
+	private int serverPort = 10001;
 	
+	public String getServerIp() {
+		return serverIp;
+	}
+
+	public void setServerIp(String serverIp) {
+		this.serverIp = serverIp;
+	}
+
+	public int getServerPort() {
+		return serverPort;
+	}
+
+	public void setServerPort(int serverPort) {
+		this.serverPort = serverPort;
+	}
+
+	
+ 	
 	public Settings() {
 		
 	}

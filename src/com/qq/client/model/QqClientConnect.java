@@ -9,15 +9,18 @@ import java.io.*;
 import com.qq.client.tools.ClientConServerThread;
 import com.qq.common.*;
 import com.qq.client.tools.*;
+import com.qq.client.tools.*;
 
 public class QqClientConnect {
 	
 	public  Socket s;
-	
+	public String serverIp= new Settings().getServerIp();
+	public int serverPort = new Settings().getServerPort();
 	public boolean SendLoginToServer(Object o) throws ClassNotFoundException {
 		boolean bl = false;
 		try {
-			s = new Socket ("192.168.3.100",10001);
+			System.out.println(serverIp+" "+serverPort);
+			s = new Socket (serverIp,serverPort);
 			ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
 			oos.writeObject(o);
 			
@@ -51,7 +54,7 @@ public class QqClientConnect {
 	public void SendInfoToServer(Object o) {
 		
 		try {
-		s = new Socket ("192.168.3.100",10001);
+		s = new Socket (serverIp,serverPort);
 		
 		
 		
